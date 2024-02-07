@@ -13,11 +13,17 @@ struct student{
   int ID;
   student* next;
 };
+void getStudentInfo(student* ns);
+int ADD(student** &list, student* ns, int size);
+int reHash(student** &list, int size);
+void PRINT(student** list, int size);
+void printStudent(student* s);
+void DELETE(student** list, int size, int delID);
 
 int main() {
   bool running = true;
   char command[8];
-  int randomID = 0;
+  int randomID = 100;
   srand(time(NULL));
   randomID = rand() % 999999 +1; //creates the slot where ADDRAND will add all the students for testing
   student** list = new student* [100];
@@ -68,8 +74,8 @@ int main() {
                 int randomFirst = rand() % 19;
                 int randomLast = rand() % 19;
                 //assign random data to new studen
-                strcpy(newStudent->firstName, nameFirst[randomFirst]);
-                strcpy(newStudent->lastName, nameLast[randomLast]);
+                strcpy(newStudent->first, nameFirst[randomFirst]);
+                strcpy(newStudent->last, nameLast[randomLast]);
                 newStudent->ID = randomID;
                 newStudent->gpa = (float)rand() / (RAND_MAX) * 5;
                 randomID = randomID + 100;
@@ -78,29 +84,38 @@ int main() {
                 num--;
 	    }
     }
-    else if(strcmp(command, "PRINT")) {
-      void PRINT(list, size);
+    else if(strcmp(command, "PRINT") == 0) {
+      PRINT(list, size);
+    }
+    else if(strcmp(command, "DELETE") == 0) {
+      cout  << "What is the ID of the student you want to delete" << endl;
+      int delID;
+      cin >>delID;
+      cout << "Deleting Student" << endl;
+      DELETE(list, size, delID);
+    }
+    else if (strcmp(command, "QUIT") == 0) {
+      running = false;
     }
   }
 }
 //No need to pass in a pointer by reference can just pass in a pointer because it will be out of scope once done
 void getStudentInfo(student* ns) {
-  newStudent->next = NULL;
-  newStudent->prev = NULL;
+  ns->next = NULL;
   cout << "Enter first name: ";
-  cin >> newStudent->firstName;
+  cin >> ns->first;
   cin.clear();
   cin.ignore(81, '\n');
   cout << "Enter last name: ";
-  cin >> newStudent->lastName;
+  cin >> ns->last;
   cin.clear();
   cin.ignore(81, '\n');
   cout << "Enter ID: ";
-  cin >> newStudent->ID;
+  cin >> ns->ID;
   cin.clear();
   cin.ignore(81, '\n');
   cout << "Enter GPA: ";
-  cin >> newStudent->gpa;
+  cin >> ns->gpa;
   cin.clear();
   cin.ignore(81, '\n');
   return;
@@ -111,18 +126,21 @@ int ADD(student** &list, student* ns, int size) {
     int key = (ns->ID) % size;//Hash Function the key is the remainder of the ID divided by size
     if(list[key] == NULL) {
       list[key] = ns;
+      adding = false;
     }
     else if((list[key])->next == NULL) {
       (list[key])->next = ns;
+      adding = false;
     }
     else if(((list[key])->next)->next == NULL) {
       ((list[key])->next)->next = ns;
+      adding = false;
     }
     else {
       size = reHash(list, size);
     }
-    return size;
   }
+  return size;
 }
 int reHash(student** &list, int size) {
   cout << "ReHashing" << endl;
@@ -137,18 +155,18 @@ int reHash(student** &list, int size) {
       if(move->next != NULL) {
 	student* newNext = move->next;
 	move->next = NULL;
-	ADD(temp, newNext, newSize);
 	if (newNext->next != NULL) {
-	  studnet* newNext2 = newNext->next;
+	  student* newNext2 = newNext->next;
 	  newNext->next = NULL;
 	  ADD(temp, newNext2, newSize);
 	}
+	ADD(temp, newNext, newSize);
       }
       ADD(temp, move, newSize);
     }
   }
+  delete[] list;
   list = temp;
-  delete[] temp;
   return newSize;
 }
 void PRINT(student** list, int size) {
@@ -160,7 +178,7 @@ void PRINT(student** list, int size) {
 	student* Next = print->next;
 	printStudent(Next);
 	if (Next->next != NULL) {
-	  studnet* Next2 = Next->next;
+	  student* Next2 = Next->next;
 	  printStudent(Next2);
 	}
       }
@@ -168,7 +186,7 @@ void PRINT(student** list, int size) {
   }
 }
 void printStudent(student* s) {
-  cout << s->fist << " " << s->last << ", " << s->ID << ", " << s->gpa << endl;
+  cout << s->first << " " << s->last << ", " << s->ID << ", " << s->gpa << endl;
 }
 void DELETE(student** list, int size, int delID) {
   int key = delID % size;
@@ -206,7 +224,10 @@ void DELETE(student** list, int size, int delID) {
 	  else {
 	    if(list[key]->next->next->ID == delID) {
 	      delete list[key]->next->next;
-	      list[key]->next = NULL;
+	      list[key]->next->next = NULL;
+	    }
+	    else {
+	      cout << "No such student with that ID" << endl;
 	    }
 	  }
 	}
@@ -214,11 +235,3 @@ void DELETE(student** list, int size, int delID) {
     }
   }
 }
-	printStudent(Next);
-	if (Next->next != NULL) {
-	  studnet* third = second->next;
-	  printStudent(Next2);
-	}
-      }
-    }
-  }
