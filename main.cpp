@@ -27,7 +27,7 @@ int main() {
   char command[8];
   int randomID = 100;
   srand(time(NULL));
-  randomID = rand() % 999999 +1; //creates the slot where ADDRAND will add all the students for testing
+  randomID = 1; //creates the slot where ADDRAND will add all the students for testing
   student** list = new student* [100];
   int size = 100;
 
@@ -87,7 +87,7 @@ int main() {
                 strcpy(newStudent->last, nameLast[randomLast]);
                 newStudent->ID = randomID;
                 newStudent->gpa = (float)rand() / (RAND_MAX) * 5;
-                randomID = randomID + size;
+                randomID++;
                 //add new student genrated
                 size = ADD(list, newStudent, size);
                 num--;
